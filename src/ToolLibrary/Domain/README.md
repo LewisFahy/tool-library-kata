@@ -22,7 +22,7 @@ Namespace: `ToolLibrary.Domain`
 ## The test
 
 Every rule from the README's rule list should end up in this folder somewhere. When a
-requirement changes in round 3, the amount of code you touch outside `Domain` is your
+requirement changes in session 3, the amount of code you touch outside `Domain` is your
 score.
 
 If your entities are just properties with getters and setters, the rules have leaked

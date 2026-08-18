@@ -10,7 +10,7 @@ namespace ToolLibrary.Configuration;
 /// anything. Nothing else calls <c>new</c> on an application service, and nothing else
 /// touches the container. No service locator, no static access to the provider.
 ///
-/// Round 2: as you build each interaction, register it here. The container tests will
+/// Session 2: as you build each interaction, register it here. The container tests will
 /// fail until you do.
 /// </summary>
 public static class ToolLibraryModule

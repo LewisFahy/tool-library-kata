@@ -24,19 +24,30 @@ You are **the librarian**. You are not a teacher and you are definitely not an a
 
 ## Timings
 
-| Round | Length | What you're doing |
-|---|---|---|
-| Setup + framing | 10 min | Read the domain aloud. Take questions. |
-| Round 1 — interactions | 20 min | Circulate. Say almost nothing. |
-| Round 2 — build `BorrowTool` | 45 min | Answer as the librarian. Watch for constraint 3 breaking. |
-| Round 3 — curveballs | 25 min | Drop the requirements below, one at a time. |
-| Debrief | 20 min | The actual point of the day. |
+One 3-hour block. Print this and keep it next to you.
 
-If you only have 90 minutes, cut round 3 to two curveballs and protect the debrief.
+| Clock | Slot | What you're doing |
+|---|---|---|
+| 0:00 | Framing (15) | Read the domain aloud. Take questions. Check everyone's `dotnet test` runs. |
+| 0:15 | Session 1 — interactions (20) | Circulate. Say almost nothing. |
+| 0:35 | Debrief 1 (10) | Collect lists on a whiteboard. Agree a shared set. |
+| 0:45 | Break (10) | Re-pair during this. |
+| 0:55 | Session 2 — build `BorrowTool` (50) | Answer as the librarian. Watch for constraint 3 breaking. |
+| 1:45 | Debrief 2 (15) | Two pairs' `Execute` methods on the screen, side by side. |
+| 2:00 | Break (10) | |
+| 2:10 | Session 3 — curveballs (30) | Drop 3 of the requirements below, ~10 min each. |
+| 2:40 | Final debrief (20) | The actual point of the session. |
+
+**Where to take the time from if you overrun:** session 3, then framing. Never the final
+debrief — a kata with no debrief is just typing.
+
+**Three hours only gets you through this once**, so don't try to squeeze in a blank-page
+re-run. Book the second run for a few weeks later instead; that's where the repetition
+value lives.
 
 ---
 
-## Round 1 checkpoints
+## Session 1 checkpoints
 
 You're looking for a list roughly like:
 
@@ -54,11 +65,11 @@ Things to watch for and *not* correct immediately:
 - **Merged interactions** — is "return a tool" the same interaction as "return a damaged
   tool"? There's no right answer. Make them defend one.
 
-Resist the urge to teach here. Let them build `LoanManager` and feel it in round 2.
+Resist the urge to teach here. Let them build `LoanManager` and feel it in session 2.
 
 ---
 
-## Round 2 checkpoints
+## Session 2 checkpoints
 
 Walk the room. The tells:
 
@@ -107,15 +118,19 @@ save
 publish that it happened
 ```
 
-If a pair gets there early, don't let them idle — give them a round 3 curveball ahead of
+If a pair gets there early, don't let them idle — give them a session 3 curveball ahead of
 schedule.
 
 ---
 
-## Round 3 — the curveballs
+## Session 3 — the curveballs
 
-Drop these **one at a time**, out loud, to the whole room. Give each one 5 minutes.
-Nobody has to finish the change; the point is to see where it lands.
+Drop these **one at a time**, out loud, to the whole room. In a 30-minute session you'll get
+through **three** — pick 1 and 2, then either 3 or 4 depending on where the room is
+struggling. Give each one about 10 minutes and cut it off whether or not they're done.
+
+Nobody has to finish the change; the point is to see where it lands. Ask each pair
+**"how many files did you have to open?"** rather than whether it works.
 
 1. **"Ladders go out for 2 days, not 7."**
    Where did the loan period live? A constant in the service is the common answer, and it's
@@ -146,15 +161,20 @@ Nobody has to finish the change; the point is to see where it lands.
 
 ---
 
-## Debrief
+## The two debriefs
 
-Run it as a group, code on a screen. Questions in `README.md`, in that order. A few things
-worth steering towards:
+**Debrief 1 (10 min, after session 1)** — purely convergent. Collect the interaction lists
+on a whiteboard, merge them, and agree a shared set so everyone starts session 2 from the
+same place. Don't philosophise; you need the time later.
+
+**Debrief 2 (15 min, after session 2)** — code on a screen. Put two pairs' `Execute` methods
+side by side. Different shapes, both defensible, is the most useful thing they'll see all
+day. Ask the authors to read them aloud rather than explain them.
+
+**Final debrief (20 min)** — questions in `README.md`, in that order. Steer towards:
 
 - **"It depends" is the honest answer to most of it** — but make them say *what* it depends
   on. That's the skill.
-- **Compare two pairs' `Execute` methods side by side.** Different shapes, both defensible,
-  is the most useful thing they'll see all day.
 - **Name the trade-off out loud.** A rich domain costs indirection. Someone should say so.
 - **Land it at home.** Finish with: "where in our codebase do we do the opposite of this?"
   Write the answers down. That list is worth more than the kata.
@@ -163,10 +183,11 @@ worth steering towards:
 
 ## Running it again
 
-This is a *kata*, not a workshop. The value is in repetition.
+This is a *kata*, not a workshop, and three hours only gets you through it once. The value
+is in repetition.
 
 - Same problem, blank page, 2–4 weeks later.
-- Second run: add a round 4 constraint from the README.
+- Second run: add a constraint from the README's "If you want more".
 - Third run: swap facilitators, so someone else has to play the librarian.
 
 Don't let anyone keep their solution between runs.

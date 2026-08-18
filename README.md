@@ -84,8 +84,37 @@ steamers — instead of buying them.
 
 ## Format
 
-- **Timebox:** 90 minutes, or three 45-minute sessions run as rounds.
-- **Pairs or triples.** The pairing matters more than the code.
+**One 3-hour block, three sessions, in pairs.**
+
+The three sessions build on each other: find the interactions, build one, then have the
+requirements change underneath you. The debriefs between them are not padding — they're
+where the thing you just did turns into something you can articulate.
+
+| | | |
+|---|---|---|
+| 0:00 | **Framing** (15 min) | Read the domain aloud, questions, `dotnet test` |
+| 0:15 | **Session 1 — find the interactions** (20 min) | Paper only, no code |
+| 0:35 | Debrief + agree the list (10 min) | |
+| 0:45 | *Break* (10 min) | |
+| 0:55 | **Session 2 — build `BorrowTool`** (50 min) | The main event |
+| 1:45 | Debrief — compare `Execute` methods (15 min) | Code on a screen |
+| 2:00 | *Break* (10 min) | |
+| 2:10 | **Session 3 — pressure test** (30 min) | Requirements change without warning |
+| 2:40 | **Final debrief** (20 min) | The actual point |
+| 3:00 | Done | |
+
+If you overrun, take it out of session 3. Never out of the final debrief.
+
+### Ground rules
+
+- **Pairs, one machine.** Swap driver and navigator every 10 minutes — set a timer, it
+  won't happen otherwise.
+- **Re-pair after session 1**, so the modelling conversation starts fresh for the build.
+- **You won't finish.** A kata that gets completed was too easy. Stop on time, not on
+  done-ness.
+
+### Technical constraints
+
 - **C#, NUnit, FakeItEasy.** Already set up in this repo.
 - **No database.** Repository interfaces only, faked in tests. Persistence is a distraction.
 - **A real container** — `Microsoft.Extensions.DependencyInjection`, wired through a single
@@ -107,6 +136,23 @@ steamers — instead of buying them.
 Rule 4 catches people out. The container is for the *application*; the tests are where you
 find out whether your dependencies are honest.
 
+### Set up before you arrive
+
+```bash
+git clone <this repo>
+cd tool-library-kata
+dotnet test          # 5 tests, 2 red — that's the starting line
+```
+
+Do this the day before. Twelve people restoring NuGet packages at 9am is not how you want
+to spend the first twenty minutes.
+
+### Afterwards
+
+This is a *kata*, which means its value is in repetition — and three hours gets you through
+it exactly once. Run the whole thing again from a blank page in a few weeks, with new
+pairs. The second run is where the pattern actually sticks.
+
 ---
 
 ## Guard tests
@@ -126,7 +172,7 @@ by the test harness, so you never have to write a throwaway stub to get green.
 
 ---
 
-## Round 1 — Find the interactions (20 min, no code)
+## Session 1 — Find the interactions (20 min, no code)
 
 On paper or a whiteboard, list every **interaction** with the system. An interaction is
 something an actor *does*, phrased as a verb from their point of view.
@@ -141,7 +187,7 @@ person do when they call that?*
 
 ---
 
-## Round 2 — Build one interaction, outside-in (45 min)
+## Session 2 — Build one interaction, outside-in (50 min)
 
 Pick **`BorrowTool`**. It's the richest. There's a red test waiting for you in
 `tests/ToolLibrary.Tests/BorrowToolShould.cs`.
@@ -153,7 +199,7 @@ Write the test first. It should read like the interaction:
 public void Lend_the_tool_to_the_member_and_set_the_due_date_seven_days_out()
 ```
 
-Constraints for this round:
+Constraints for this session:
 
 1. The application service has **one public method, `Execute`**.
 2. `Execute` takes a **command/DTO**, not domain entities, and returns a DTO or void.
@@ -174,18 +220,22 @@ which is exactly why constructor size is worth watching.
 
 ---
 
-## Round 3 — Pressure test the model (25 min)
+## Session 3 — Pressure test the model (30 min)
 
 Your facilitator will drop new requirements on you, one at a time, without warning.
 
-The measure of a good model isn't how it handles round 2. It's how cheaply it absorbs
-round 3.
+You won't finish them, and you're not supposed to. For each one, the useful question isn't
+"is it done?" but **"how many files did I have to open?"**
+
+The measure of a good model isn't how it handles session 2. It's how cheaply it absorbs
+session 3.
 
 ---
 
-## Round 4 (optional) — Constraints round
+## If you want more
 
-Re-run `BorrowTool` from a blank page with one added constraint:
+Not part of the 3 hours — these are for a second run, weeks later. Re-do `BorrowTool` from
+a blank page with one added constraint:
 
 - **No primitives** in the domain — no bare `string`, `int`, `DateTime` crossing a boundary.
 - **No getters** on domain entities — tell, don't ask.
@@ -194,9 +244,10 @@ Re-run `BorrowTool` from a blank page with one added constraint:
 
 ---
 
-## Debrief (20 min — do not skip)
+## Final debrief (20 min — do not skip)
 
-This is where the learning happens.
+This is where the learning happens. There's an earlier 15-minute debrief after session 2,
+which is about *your* code; this one is about what it means.
 
 1. Show your `Execute` method. Read it aloud. Does it read as the interaction?
 2. Where did the *"can this member borrow?"* decision end up? Why there?
@@ -205,9 +256,10 @@ This is where the learning happens.
 5. Where's your transaction boundary? What happens if the email send fails after the commit?
 6. How many constructor parameters does your service have? What would a seventh mean?
 7. What lifetimes did you pick, and what breaks if you get one wrong?
-8. Which round 3 change was cheapest? Which hurt? What does that tell you?
+8. Which session 3 change was cheapest? Which hurt? What does that tell you?
 
-Then map it back: *where in our own codebase do we do the opposite of this?*
+Then map it back: *where in our own codebase do we do the opposite of this?* Write those
+answers down. That list is the thing you actually take away.
 
 ---
 
