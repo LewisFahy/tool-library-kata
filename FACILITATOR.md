@@ -3,6 +3,10 @@
 Don't share this file with participants before the session. Everything they need is in
 `README.md`; this is the stuff that only works if it's a surprise.
 
+> **Setup check:** run `dotnet test` before the session. You should see **5 tests, 2 failing**
+> (`Lend_the_tool_to_the_member_...` and `Know_about_at_least_one_interaction`). The other
+> three pass vacuously and start biting as soon as code appears.
+
 ---
 
 ## Your job
@@ -70,6 +74,29 @@ Walk the room. The tells:
   reservation release fails.
 - **Stuck on infrastructure.** Someone will start writing a fake in-memory repository with
   real query logic. Redirect: FakeItEasy, one line, move on.
+- **Fighting the guard tests.** Someone will try to delete `ContainerShould` or add a second
+  public method "just for the test". Don't allow it — ask what the test is telling them.
+
+### On the container specifically
+
+The container is there to make dependencies *visible*, not to teach DI. Most of the
+learning is in what it exposes:
+
+- **Constructor creep.** The container will cheerfully build a service with nine
+  dependencies. Nothing fails. Ask the pair to read their constructor parameters aloud as a
+  sentence — if it doesn't sound like one interaction, it isn't one.
+- **Reaching for the container in a test.** A few pairs will try to resolve their service
+  from a `ServiceCollection` inside a unit test. That's the tell that construction is
+  painful, and the fix is in the design, not the test.
+- **`IServiceProvider` injected into a service.** There's a guard test for it. When it
+  fires, connect it to the codebase: this is exactly the ServiceResolver pattern, and it's
+  only legitimate where serialisation forces it.
+- **Lifetimes.** Most pairs pick `AddScoped` without thinking. Ask what a singleton
+  application service would mean when two members borrow at once. `ValidateScopes` is on,
+  so captive dependencies fail loudly — that's a good five minutes if it happens.
+- **Registering the domain.** Watch for entities being registered in the container. A
+  `Member` is loaded from a repository, not resolved. If they've registered one, the model
+  has drifted towards services-with-data.
 
 A good `Execute` ends up near:
 
@@ -110,6 +137,12 @@ Nobody has to finish the change; the point is to see where it lands.
    who is also a member."**
    Is that one interaction or two? Is it `ReturnTool` + `BorrowTool`, or something the
    business would name differently?
+
+6. *(spare)* **"Fines are going up to £1.50 a day in April, but only at the Southside
+   branch."**
+   Now the rule varies by time *and* by place. Does that become a constructor dependency, a
+   registration-time decision, or something the domain asks for? Whatever they choose,
+   make them say where it gets configured — this one lands squarely on the composition root.
 
 ---
 

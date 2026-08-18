@@ -13,7 +13,23 @@ interactions into application services with a well-modelled domain underneath.
 dotnet test
 ```
 
-One test. It's red. That's your starting line.
+Five tests, two red. That's your starting line.
+
+The two failures tell you the same thing from different angles: you haven't modelled an
+interaction yet.
+
+### Where things live
+
+```
+src/ToolLibrary/
+├── Domain/                 your model — entities, value objects, domain services
+├── Application/            one class per interaction
+└── Configuration/          ToolLibraryModule — the composition root
+tests/ToolLibrary.Tests/
+├── BorrowToolShould.cs     start here
+├── ContainerShould.cs      guard tests (don't delete)
+└── *.cs                    test harness plumbing
+```
 
 ---
 
@@ -72,7 +88,41 @@ steamers — instead of buying them.
 - **Pairs or triples.** The pairing matters more than the code.
 - **C#, NUnit, FakeItEasy.** Already set up in this repo.
 - **No database.** Repository interfaces only, faked in tests. Persistence is a distraction.
-- **No frameworks.** No DI container, no mapping library, no ORM.
+- **A real container** — `Microsoft.Extensions.DependencyInjection`, wired through a single
+  composition root in `src/ToolLibrary/Configuration/ToolLibraryModule.cs`.
+- **No other frameworks.** No mapping library, no ORM, no mediator.
+
+### The container rules
+
+1. **One composition root.** `ToolLibraryModule` is the only place allowed to know how to
+   build anything.
+2. **Constructor injection only.** No `IServiceProvider` in an application service, no
+   static access to the container, no service locator.
+3. **Register as you go.** Each interaction you build gets registered. `ContainerShould`
+   fails until it is.
+4. **Tests don't use the container.** Unit tests `new` up the service under test and pass
+   fakes by hand. If a test needs the container to build its subject, the constructor is
+   telling you something.
+
+Rule 4 catches people out. The container is for the *application*; the tests are where you
+find out whether your dependencies are honest.
+
+---
+
+## Guard tests
+
+Three tests enforce the constraints so the facilitator doesn't have to nag:
+
+| Test | What it's protecting |
+|---|---|
+| `ContainerShould.Know_about_at_least_one_interaction` | You've modelled something as an interaction |
+| `ContainerShould.Resolve_every_interaction_it_has_been_asked_to_build` | Registrations and lifetimes are real |
+| `ApplicationServicesShould.Expose_one_public_method_each_named_Execute` | One service, one interaction |
+| `ContainerShould.Only_ever_be_touched_by_the_composition_root` | No service locator |
+
+They're part of the kata, not scaffolding — if one is in your way, that's the lesson
+talking. Ports with no implementation (repositories, clock, email) are faked automatically
+by the test harness, so you never have to write a throwaway stub to get green.
 
 ---
 
@@ -112,11 +162,15 @@ Constraints for this round:
 4. Everything it touches from the outside world sits behind an **interface you own**.
 5. `Execute` is **one unit of work**. Decide where the transaction starts and ends, and be
    able to justify it.
+6. The service is **registered in the composition root** and resolves from the container,
+   with a lifetime you can defend.
 
 Constraint 3 is the whole exercise. Expect it to hurt.
 
 A finished `Execute` should read roughly *load → delegate → save → maybe publish*. If it's
-60 lines long, your domain is anaemic.
+60 lines long, your domain is anaemic. If its constructor has seven parameters, it's doing
+more than one interaction's worth of work — the container will happily build it anyway,
+which is exactly why constructor size is worth watching.
 
 ---
 
@@ -149,7 +203,9 @@ This is where the learning happens.
 3. Who else could have made that decision? What would that have cost you?
 4. What did you name things? Would the librarian recognise the words?
 5. Where's your transaction boundary? What happens if the email send fails after the commit?
-6. Which round 3 change was cheapest? Which hurt? What does that tell you?
+6. How many constructor parameters does your service have? What would a seventh mean?
+7. What lifetimes did you pick, and what breaks if you get one wrong?
+8. Which round 3 change was cheapest? Which hurt? What does that tell you?
 
 Then map it back: *where in our own codebase do we do the opposite of this?*
 
