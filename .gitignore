@@ -1,5 +1,9 @@
 bin/
 obj/
 .vs/
+.idea/
 *.user
 TestResults/
+
+# Facilitator-only material — participants shouldn't read this before the session.
+FACILITATOR.md

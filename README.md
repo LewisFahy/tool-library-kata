@@ -268,3 +268,12 @@ answers down. That list is the thing you actually take away.
 You won't finish, and you're not meant to. A kata that gets completed was too easy.
 Stop on time, not on done-ness — then run the whole thing again from a blank page a few
 weeks later. The second run is where the pattern actually sticks.
+
+---
+
+## Facilitating this?
+
+There's a separate facilitator guide — timings, what to watch for, and the session 3
+curveballs. It's deliberately not in this repo, because most of it only works if the room
+hasn't read it. Ask whoever ran it last.
+
