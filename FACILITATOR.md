@@ -126,38 +126,122 @@ schedule.
 ## Session 3 — the curveballs
 
 Drop these **one at a time**, out loud, to the whole room. In a 30-minute session you'll get
-through **three** — pick 1 and 2, then either 3 or 4 depending on where the room is
-struggling. Give each one about 10 minutes and cut it off whether or not they're done.
+through **three**. Give each one about 10 minutes and cut it off whether or not they're done.
 
 Nobody has to finish the change; the point is to see where it lands. Ask each pair
 **"how many files did you have to open?"** rather than whether it works.
 
+### Picking three
+
+Don't work through them in order — choose based on what you saw in session 2.
+
+| If session 2 showed... | Use |
+|---|---|
+| Business rules sitting in `Execute` | 1, then 2 |
+| Anaemic entities (all getters/setters) | 1, then 5 |
+| A service with a huge constructor | 3, then 8 |
+| `DateTime.Now` visible anywhere in the domain | 12 |
+| Confident pairs who finished early | 7, then 11 |
+| Nobody questioning the requirements | 14 |
+| A solid, balanced model | 2, 4, then 6 |
+
+A reliable default is **1 → 2 → 4**: cheap, then structural, then architectural.
+
+### The curveballs
+
+**Where does a value live?**
+
 1. **"Ladders go out for 2 days, not 7."**
    Where did the loan period live? A constant in the service is the common answer, and it's
-   now wrong in a way that spreads.
+   now wrong in a way that spreads. The cheapest possible change — if this one hurts,
+   everything after it will too.
 
 2. **"Stewards can override the 3-tool limit for someone doing community work."**
    Is the limit a hard-coded `if`, or a policy that can vary? Watch for a boolean parameter
    creeping into the command — ask what the *third* override will do to that design.
 
-3. **"We want to email the member when a tool they reserved comes back."**
+3. **"Fines are going up to £1.50 a day in April, but only at the Southside branch."**
+   The rule now varies by time *and* by place. Constructor dependency, registration-time
+   decision, or something the domain asks for? Make them say where it gets configured —
+   this one lands squarely on the composition root.
+
+**Who is allowed to know things?**
+
+4. **"We want to email the member when a tool they reserved comes back."**
    Does `ReturnTool` now know about email? Should it? Where does the event go, and what
    happens if the send fails after the commit?
 
-4. **"The committee wants a report of who's had a tool out the longest."**
+5. **"The committee wants a report of who's had a tool out the longest."**
    Does a read model force them to break the write model? Watch for someone adding a getter
    to a domain entity purely so a report can see inside it.
 
-5. *(spare, if a pair is flying)* **"A member wants to transfer a loan to their neighbour,
-   who is also a member."**
-   Is that one interaction or two? Is it `ReturnTool` + `BorrowTool`, or something the
-   business would name differently?
+6. **"The insurers want to know who had a given tool, going back three years."**
+   History as a first-class concern. Most models silently overwrite state — a loan ends and
+   the record is mutated. Ask what they'd have to reconstruct, and from what. This is the
+   gentlest possible introduction to event sourcing without saying the words.
 
-6. *(spare)* **"Fines are going up to £1.50 a day in April, but only at the Southside
-   branch."**
-   Now the rule varies by time *and* by place. Does that become a constructor dependency, a
-   registration-time decision, or something the domain asks for? Whatever they choose,
-   make them say where it gets configured — this one lands squarely on the composition root.
+**What is an interaction, really?**
+
+7. **"A member wants to transfer a loan to their neighbour, who is also a member."**
+   One interaction or two? Is it `ReturnTool` + `BorrowTool`, or something the business
+   would name differently? If they compose two existing services, ask who owns the
+   transaction.
+
+8. **"At the start of a session a steward checks out 30 tools to a school group in one go."**
+   Does `BorrowTool` get a loop, a list parameter, or a new interaction alongside it? What
+   happens if tool 17 fails — all or nothing, or partial success? The command shape is
+   usually the first thing to buckle.
+
+9. **"We're putting a self-service kiosk in the lobby. Members scan and borrow without a
+   steward."**
+   Same interaction, different actor and entry point. If the answer is "just call the same
+   application service", their layering is working. If the rules were living in something
+   steward-shaped, this is where it shows.
+
+**The awkward realities**
+
+10. **"Two stewards served the same member at the same time and they went home with four
+    tools."**
+    The 3-tool limit was checked, then acted on, and something happened in between. Where
+    does that invariant actually get enforced? Nobody will solve this in 10 minutes and
+    that's fine — the goal is for them to locate the seam, not to implement locking.
+
+11. **"A steward double-clicked and the member got charged the fine twice."**
+    Idempotency. Is `Execute` safe to run twice with the same command? Should the command
+    carry an identity? Watch for the instinct to fix it in the UI.
+
+12. **"The library shuts over Christmas. Nothing should count as overdue between the 24th
+    and the 2nd."**
+    Suddenly "how many days late is this?" is a domain rule rather than arithmetic. The
+    trap is `DateTime.Now` buried somewhere — if the clock isn't already a dependency, this
+    change is untestable, and they'll discover that the moment they try to write the test.
+    Ask to see the test for the boundary case.
+
+13. **"Actually, forget suspensions — we've never used them. But now nobody can borrow more
+    than £500 of kit at once, by replacement cost."**
+    A rule is deleted and an unrelated one appears. Two things to watch: how much is
+    entangled with the rule going away, and — more interesting — whether anyone asks *why*
+    before deleting. A model that's easy to delete from is a good sign.
+
+**The one where the answer is "no"**
+
+14. **"Can you make it so I can just tick a box to skip all the checks? I trust my regulars."**
+    Say it casually, like it's a small thing. The interesting response isn't code, it's a
+    question: *which* checks, for whom, and who's accountable when it goes wrong? Some
+    requirements should be pushed back on, and modelling gives you the vocabulary to do it
+    precisely rather than just resisting. If a pair silently implements a `skipValidation`
+    flag, that's the debrief.
+
+### Writing your own
+
+The good ones share a shape: **a rule the team believed was fixed turns out to vary**.
+
+To invent one on the spot, take any sentence from the rule list and vary it along one axis —
+by time, by place, by actor, by tool type, by member. Then ask who else needs to know.
+
+Avoid: anything requiring a new external system, anything that's really a UI change, and
+anything with an obviously correct answer. The best curveballs are the ones where two pairs
+reasonably disagree.
 
 ---
 
