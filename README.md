@@ -249,7 +249,8 @@ a blank page with one added constraint:
 This is where the learning happens. There's an earlier 15-minute debrief after session 2,
 which is about *your* code; this one is about what it means.
 
-1. Show your `Execute` method. Read it aloud. Does it read as the interaction?
+1. Read your `Execute` aloud again. Has it changed since debrief 2? What did the curveballs
+   do to it?
 2. Where did the *"can this member borrow?"* decision end up? Why there?
 3. Who else could have made that decision? What would that have cost you?
 4. What did you name things? Would the librarian recognise the words?
